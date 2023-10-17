@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<div th:replace="layout/header"></div>
+<head>
+    <title>회고록 작성</title>
+    <meta charset="utf-8">
+    <!--  jQuery, bootstrap -->
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+
+    <!-- summernote css/js-->
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.8/summernote.css" rel="stylesheet">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.8/summernote.js"></script>
+
+    <style>
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px; /* 버튼 사이의 간격 */
+        }
+    </style>
+
+    <script>
+        // 메인화면 페이지 로드 함수
+        $(document).ready(function () {
+            $('#summernote').summernote({
+                placeholder: '내용을 작성하세요',
+                height: 400,
+                maxHeight: 400
+            });
+        });
+
+        function cancelWrite() {
+            // 현재 페이지에서 이전 페이지로 돌아가는 동작
+            window.history.back();
+        }
+
+        function resetForm() {
+            // 폼의 모든 입력 내용을 초기화
+            document.querySelector("form").reset();
+
+            // summernote의 경우 따로 초기화
+            $('#summernote').summernote('code', '');
+        }
+
+        function submit(){
+            var title = document.getElementById("title").value;
+            var content = document.getElementById("content").value;
+
+            var id = parseInt(document.getElementById("id").value);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/group/" + id + "/write", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert("회고 글이 등록되었습니다.");
+                    window.location.href = "/review/" + id + "/list";
+                } else {
+                    alert("글 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+                }
+            };
+
+            var data = JSON.stringify({
+                id: id,
+                title: title,
+                content: content
+            });
+            xhr.send(data);
+        }
+    </script>
+
+
+</head>
+
+
+<body>
+<br/>
+<div class="col-sm-12">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        <div class="container text">
+            <input type="hidden" id="id" th:value="${id}">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="제목을 입력해주세요.">
+            </div>
+            <hr/>
+
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea name="content" id="content" class="form-control" placeholder="내용을 입력해주세요."></textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-light" onclick="resetForm()">지우기</button>
+                <button type="button" class="btn btn-primary" onclick="submit()">작성</button>
+                <button type="button" class="btn btn-light" onclick="cancelWrite()">목록</button>
+            </div>
+            <br/>
+        </div>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+</body>
+<div th:replace="layout/footer"></div>
+</html>

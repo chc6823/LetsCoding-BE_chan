@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<div th:replace="layout/header"></div>
+<head>
+    <meta charset="UTF-8">
+    <title>회고 목록</title>
+</head>
+
+<style>
+    div.scroller {
+        height: 500px;
+        overflow-y: scroll;
+        scrollbar-color: pink lightblue;
+        margin-left: 20px;
+    }
+    .col-num1 {
+        width: 15%;
+    }
+    .col-num2 {
+        width: 35%;
+    }
+    .col-num3 {
+        width: 50%;
+    }
+</style>
+<script>
+    function cancelWrite() {
+        // 현재 페이지에서 이전 페이지로 돌아가는 동작
+        window.history.back();
+    }
+    // 보이는 글자수 제한
+    function limitText(element, limit) {
+        if (element.value.length > limit) {
+            element.value = element.value.substring(0, limit);
+        }
+    }
+</script>
+<body>
+<div class="container-fluid">
+    <div class="scroller">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>내용</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="review : ${reviews}">
+                <td><a th:href="@{'/review/' + ${id} + '/read/' + ${review.review_id}}">
+                    <span class="col-num2" th:text="${review.title}"></span>
+                </a></td>
+                <td class="col-num3" oninput="limitText(this, 10)" th:text="${review.content}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-md-3">
+            <a th:href="@{/review/{id}/write(id=${id})}" class="btn btn-primary" role="button">회고 작성</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
